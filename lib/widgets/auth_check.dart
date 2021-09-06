@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:topmenu_app/pages/login_page.dart';
 import 'package:topmenu_app/services/auth_service.dart';
-import 'package:topmenu_app/topmenu_app.dart';
+import 'package:topmenu_app/pages/home_page.dart';
 
 class AuthCheck extends StatefulWidget {
   AuthCheck({Key? key}) : super(key: key);
@@ -21,7 +21,7 @@ class _AuthCheckState extends State<AuthCheck> {
     else if (auth.user == null)
       return LoginPage();
     else
-      return TopMenuApp();
+      return HomePage();
   }
 
   loading() {
