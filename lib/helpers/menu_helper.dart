@@ -1,5 +1,5 @@
-import 'package:topmenu_app/models/Menu.dart';
 import 'package:sqflite/sqflite.dart';
+import 'package:topmenu_app/models/menu.dart';
 import 'package:path/path.dart';
 
 class MenuHelper {

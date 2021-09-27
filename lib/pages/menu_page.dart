@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:topmenu_app/helpers/menu_helper.dart';
-import 'package:topmenu_app/models/Menu.dart';
+import 'package:topmenu_app/models/menu.dart';
 
 class MenuPage extends StatefulWidget {
   MenuPage({Key? key}) : super(key: key);
