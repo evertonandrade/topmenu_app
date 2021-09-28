@@ -1,7 +1,8 @@
-import 'package:flutter/material.dart';
 import 'topmenu_app.dart';
+import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:provider/provider.dart';
+import 'package:topmenu_app/services/items_service.dart';
 import 'package:topmenu_app/services/auth_service.dart';
 
 void main() async {
@@ -12,6 +13,7 @@ void main() async {
     MultiProvider(
       providers: [
         ChangeNotifierProvider(create: (context) => AuthService()),
+        ChangeNotifierProvider(create: (context) => ItemsService()),        
       ],
       child: TopMenuApp(),
     ),
