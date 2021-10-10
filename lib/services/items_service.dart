@@ -1,11 +1,11 @@
-import 'dart:math';
-
+import 'dart:convert';
 import 'package:flutter/material.dart';
-import 'package:topmenu_app/data/dummy_item.dart';
+import 'package:http/http.dart' as http;
 import 'package:topmenu_app/models/item.dart';
+import 'package:topmenu_app/shared/config.dart';
 
 class ItemsService with ChangeNotifier {
-  Map<String, Item> _items = {...DUMMY_ITEMS};
+  static Map<String, Item> _items = {};
 
   List<Item> get all {
     return [..._items.values];
@@ -19,10 +19,39 @@ class ItemsService with ChangeNotifier {
     return _items.values.elementAt(index);
   }
 
-  void put(Item item) {
-    
+  Future getAll() async {
+    var response = await http.get(
+      Uri.https(
+        Config.baseUrl,
+        'items.json',
+      ),
+    );
+    final items = jsonDecode(response.body);
+    if (items != null) {
+      items.forEach((key, value) {
+        value['id'] = key;
+        _items[key] = Item.fromJson(value);
+      });
+    }
+    notifyListeners();
+  }
+
+  Future<void> put(Item item) async {
     // altera ou adiciona
     if (_items.containsKey(item.id)) {
+      await http.patch(
+        Uri.https(
+          Config.baseUrl,
+          'items/${item.id}.json',
+        ),
+        body: json.encode({
+          'name': item.name,
+          'description': item.description,
+          'price': item.price,
+          'imageUrl': item.imageUrl,
+          'avaliable': item.avaliable,
+        }),
+      );
       _items.update(
         item.id,
         (_) => Item(
@@ -34,7 +63,22 @@ class ItemsService with ChangeNotifier {
         ),
       );
     } else {
-      final id = Random().nextInt(1000).toString();
+      final response = await http.post(
+        Uri.https(
+          Config.baseUrl,
+          'items.json',
+        ),
+        body: json.encode({
+          'name': item.name,
+          'description': item.description,
+          'price': item.price,
+          'imageUrl': item.imageUrl,
+          'avaliable': item.avaliable,
+        }),
+      );
+
+      final id = json.decode(response.body)['name'];
+
       _items.putIfAbsent(
         id,
         () => Item(
@@ -51,7 +95,13 @@ class ItemsService with ChangeNotifier {
     notifyListeners();
   }
 
-  void remove(Item? item) {
+  Future<void> remove(Item? item) async {
+    http.delete(
+      Uri.https(
+        Config.baseUrl,
+        'items/${item?.id}.json',
+      ),
+    );
     _items.remove(item?.id);
     notifyListeners();
   }

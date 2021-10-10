@@ -3,12 +3,21 @@ import 'package:provider/provider.dart';
 import 'package:topmenu_app/models/item.dart';
 import 'package:topmenu_app/services/items_service.dart';
 
-class ItemTile extends StatelessWidget {
+class ItemTile extends StatefulWidget {
   final Item? item;
-  final _form = GlobalKey<FormState>();
-  final Map<String, Object> _formData = {};
 
   ItemTile(this.item);
+
+  @override
+  _ItemTileState createState() => _ItemTileState();
+}
+
+class _ItemTileState extends State<ItemTile> {
+  final _form = GlobalKey<FormState>();
+
+  bool _isLoading = false;
+
+  final Map<String, Object> _formData = {};
 
   @override
   Widget build(BuildContext context) {
@@ -18,19 +27,19 @@ class ItemTile extends StatelessWidget {
         height: 100,
         child: ClipRRect(
           borderRadius: BorderRadius.circular(15.0),
-          child: (item?.imageUrl == null || item?.imageUrl == '')
+          child: (widget.item?.imageUrl == null || widget.item?.imageUrl == '')
               ? Image.asset('assets/images/placeholder_food.png')
-              : Image.network('${item?.imageUrl}'),
+              : Image.network('${widget.item?.imageUrl}'),
         ),
       ),
-      title: Text(item?.name ?? ''),
+      title: Text(widget.item?.name ?? ''),
       subtitle: Column(
         mainAxisAlignment: MainAxisAlignment.start,
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text('${item?.description}'),
+          Text('${widget.item?.description}'),
           Text(
-            '${item?.priceBRL}',
+            '${widget.item?.priceBRL}',
             style: TextStyle(
               fontWeight: FontWeight.bold,
             ),
@@ -49,7 +58,6 @@ class ItemTile extends StatelessWidget {
                 showModalBottomSheet(
                   context: context,
                   builder: (BuildContext ctx) {
-                    print(context);
                     return Padding(
                       padding: const EdgeInsets.all(20.0),
                       child: Form(
@@ -59,7 +67,7 @@ class ItemTile extends StatelessWidget {
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             TextFormField(
-                              initialValue: item?.name,
+                              initialValue: widget.item?.name,
                               decoration: InputDecoration(labelText: 'Nome'),
                               onSaved: (value) =>
                                   _formData['name'] = value.toString(),
@@ -72,7 +80,7 @@ class ItemTile extends StatelessWidget {
                               },
                             ),
                             TextFormField(
-                              initialValue: item?.description,
+                              initialValue: widget.item?.description,
                               keyboardType: TextInputType.multiline,
                               decoration: InputDecoration(
                                 labelText: 'Descrição',
@@ -81,7 +89,7 @@ class ItemTile extends StatelessWidget {
                                   _formData['description'] = value.toString(),
                             ),
                             TextFormField(
-                              initialValue: item?.price.toString(),
+                              initialValue: widget.item?.price.toString(),
                               keyboardType: TextInputType.numberWithOptions(
                                 decimal: true,
                               ),
@@ -92,7 +100,7 @@ class ItemTile extends StatelessWidget {
                                   _formData['price'] = value ?? 0.00,
                             ),
                             TextFormField(
-                              initialValue: item?.imageUrl,
+                              initialValue: widget.item?.imageUrl,
                               decoration: InputDecoration(
                                 labelText: 'URL da Imagem',
                               ),
@@ -103,20 +111,42 @@ class ItemTile extends StatelessWidget {
                               height: 20,
                             ),
                             ElevatedButton(
-                              child: Text('Atualizar'),
-                              onPressed: () {
+                              child: Row(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: (_isLoading)
+                                    ? [
+                                        Padding(
+                                          padding: EdgeInsets.all(8),
+                                          child: SizedBox(
+                                            width: 12,
+                                            height: 12,
+                                            child: CircularProgressIndicator(
+                                              color: Colors.white,
+                                            ),
+                                          ),
+                                        )
+                                      ]
+                                    : [
+                                        Icon(Icons.arrow_upward_outlined),
+                                        Padding(
+                                          padding: EdgeInsets.all(8.0),
+                                          child: Text(
+                                            'Atualizar',
+                                          ),
+                                        ),
+                                      ],
+                              ),
+                              onPressed: () async {
                                 final isValid =
                                     _form.currentState?.validate() ?? false;
-                                print(_form.currentState);
                                 if (isValid) {
                                   _form.currentState?.save();
-
-                                  Provider.of<ItemsService>(
-                                    context,
-                                    listen: false,
-                                  ).put(
+                                  setState(() => _isLoading = true);
+                                  await Provider.of<ItemsService>(context,
+                                          listen: false)
+                                      .put(
                                     Item(
-                                      id: item?.id ?? '',
+                                      id: widget.item?.id ?? '',
                                       name: _formData['name'].toString(),
                                       description:
                                           _formData['description'].toString(),
@@ -127,6 +157,7 @@ class ItemTile extends StatelessWidget {
                                       avaliable: true,
                                     ),
                                   );
+                                  setState(() => _isLoading = false);
                                   Navigator.of(context).pop();
                                 }
                               },
@@ -157,9 +188,11 @@ class ItemTile extends StatelessWidget {
                       ),
                       TextButton(
                         child: Text('Sim'),
-                        onPressed: () {
-                          Provider.of<ItemsService>(context, listen: false)
-                              .remove(item);
+                        onPressed: () async {
+                          await Provider.of<ItemsService>(
+                            context,
+                            listen: false,
+                          ).remove(widget.item);
                           Navigator.of(context).pop();
                         },
                       ),
