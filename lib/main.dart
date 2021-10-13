@@ -4,6 +4,7 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:provider/provider.dart';
 import 'package:topmenu_app/services/items_service.dart';
+import 'package:topmenu_app/services/menus_service.dart';
 import 'package:topmenu_app/services/auth_service.dart';
 
 Future main() async {
@@ -16,6 +17,7 @@ Future main() async {
       providers: [
         ChangeNotifierProvider(create: (context) => AuthService()),
         ChangeNotifierProvider(create: (context) => ItemsService()),
+        ChangeNotifierProvider(create: (context) => MenusService()),
       ],
       child: TopMenuApp(),
     ),

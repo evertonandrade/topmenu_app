@@ -1,33 +1,25 @@
 class Menu {
-  int? id;
+  String? id;
   String? title;
   String? bannerUrl;
-  String? qrCode;
-  String? isActive;
-  String? updatedAt;
+  bool? isActive;
+  DateTime? updatedAt;
 
-  Menu(this.title, this.bannerUrl, this.qrCode, this.isActive, this.updatedAt);
+  Menu({
+    this.id,
+    this.title,
+    this.bannerUrl,
+    this.isActive,
+    this.updatedAt,
+  });
 
-  Menu.fromMap(Map map) {
-    this.id = map["id"];
-    this.title = map["title"];
-    this.bannerUrl = map["bannerUrl"];
-    this.qrCode = map["qrCode"];
-    this.isActive = map["isActive"];
-    this.updatedAt = map["updatedAt"];
-  }
-
-  Map toMap() {
-    Map<String, dynamic> map = {
-      "title": this.title,
-      "bannerUrl": this.bannerUrl,
-      "qrCode": this.qrCode,
-      "isActive": this.isActive,
-      "updatedAt": this.updatedAt
-    };
-    if (this.id != null) {
-      map["id"] = this.id;
-    }
-    return map;
+  factory Menu.fromJson(Map data) {
+    return Menu(
+      id: data['id'] as String,
+      title: data['title']  as String,
+      bannerUrl: data['bannerUrl'] as String,
+      isActive: data['isActive'] as bool,
+      updatedAt: DateTime.parse(data['updatedAt']),
+    );
   }
 }

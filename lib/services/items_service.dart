@@ -5,7 +5,17 @@ import 'package:topmenu_app/models/item.dart';
 import 'package:topmenu_app/shared/config.dart';
 
 class ItemsService with ChangeNotifier {
-  static Map<String, Item> _items = {};
+  Map<String, Item> _items = {};
+  String idMenu = '';
+
+  setIdMenu(dynamic id) {
+    idMenu = id;
+    notifyListeners();
+  }
+
+  clear() {
+    _items = {};
+  }
 
   List<Item> get all {
     return [..._items.values];
@@ -20,11 +30,10 @@ class ItemsService with ChangeNotifier {
   }
 
   Future getAll() async {
+    print(idMenu);
+    var path = 'menus/' + idMenu + '/items.json';
     var response = await http.get(
-      Uri.https(
-        Config.baseUrl,
-        'items.json',
-      ),
+      Uri.https(Config.baseUrl, path),
     );
     final items = jsonDecode(response.body);
     if (items != null) {
@@ -42,7 +51,7 @@ class ItemsService with ChangeNotifier {
       await http.patch(
         Uri.https(
           Config.baseUrl,
-          'items/${item.id}.json',
+          'menus/${idMenu}/items/${item.id}.json',
         ),
         body: json.encode({
           'name': item.name,
@@ -66,7 +75,7 @@ class ItemsService with ChangeNotifier {
       final response = await http.post(
         Uri.https(
           Config.baseUrl,
-          'items.json',
+          'menus/${idMenu}/items.json',
         ),
         body: json.encode({
           'name': item.name,
@@ -99,7 +108,7 @@ class ItemsService with ChangeNotifier {
     http.delete(
       Uri.https(
         Config.baseUrl,
-        'items/${item?.id}.json',
+        'menus/${idMenu}/items/${item?.id}.json',
       ),
     );
     _items.remove(item?.id);

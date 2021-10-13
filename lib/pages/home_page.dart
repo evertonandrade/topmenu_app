@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:topmenu_app/pages/items_page.dart';
 import 'package:topmenu_app/pages/location_page.dart';
 import 'package:topmenu_app/pages/menu_page.dart';
 import 'package:topmenu_app/pages/settings_page.dart';
@@ -34,7 +33,7 @@ class _HomePageState extends State<HomePage> {
         controller: pc,
         children: [
           LocationPage(),
-          ItemPage(),
+          MenuPage(),
           SettingsPage()
         ],
         onPageChanged: setCurrentPage,
