@@ -61,6 +61,7 @@ class MenusService with ChangeNotifier {
       _menus.update(
         menu.id as String,
         (_) => Menu(
+          id: menu.id,
           title: menu.title,
           bannerUrl: menu.bannerUrl,
           isActive: menu.isActive,
