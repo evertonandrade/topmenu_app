@@ -30,7 +30,6 @@ class ItemsService with ChangeNotifier {
   }
 
   Future getAll() async {
-    print(idMenu);
     var path = 'menus/' + idMenu + '/items.json';
     var response = await http.get(
       Uri.https(Config.baseUrl, path),

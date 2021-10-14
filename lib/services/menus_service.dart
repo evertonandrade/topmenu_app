@@ -42,6 +42,35 @@ class MenusService with ChangeNotifier {
     notifyListeners();
   }
 
+  Future update(Menu menu) async {
+    if (_menus.containsKey(menu.id)) {
+      await http.patch(
+        Uri.https(
+          Config.baseUrl,
+          'menus/${menu.id}.json',
+        ),
+        body: jsonEncode(
+          {
+            'title': menu.title,
+            'bannerUrl': menu.bannerUrl,
+            'isActive': menu.isActive,
+            'updatedAt': menu.updatedAt!.toIso8601String(),
+          },
+        ),
+      );
+      _menus.update(
+        menu.id as String,
+        (_) => Menu(
+          title: menu.title,
+          bannerUrl: menu.bannerUrl,
+          isActive: menu.isActive,
+          updatedAt: menu.updatedAt,
+        ),
+      );
+    }
+    notifyListeners();
+  }
+
   Future getAll() async {
     final response = await http.get(
       Uri.https(
@@ -53,11 +82,9 @@ class MenusService with ChangeNotifier {
     if (menus != null) {
       menus.forEach((key, value) {
         value['id'] = key;
-        print(value);
         _menus[key] = Menu.fromJson(value);
       });
     }
-    print(_menus);
     notifyListeners();
   }
 
