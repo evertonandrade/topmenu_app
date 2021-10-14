@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:topmenu_app/widgets/auth_check.dart';
+import 'routes/router.dart' as router;
+import 'package:topmenu_app/routes/app_routes.dart';
 
 class TopMenuApp extends StatelessWidget {
   @override
@@ -8,7 +9,8 @@ class TopMenuApp extends StatelessWidget {
       title: 'TopMenu App',
       debugShowCheckedModeBanner: false,
       theme: ThemeData(primarySwatch: Colors.deepOrange),
-      home: AuthCheck(),
+      onGenerateRoute: router.generateRoute,
+      initialRoute: AppRoutes.HOME,
     );
   }
 }
