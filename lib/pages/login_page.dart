@@ -1,6 +1,9 @@
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:topmenu_app/routes/app_routes.dart';
 import 'package:topmenu_app/services/auth_service.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:topmenu_app/services/google_sigin_service.dart';
 
 class LoginPage extends StatefulWidget {
   LoginPage({Key? key}) : super(key: key);
@@ -13,54 +16,37 @@ class _LoginPageState extends State<LoginPage> {
   final formKey = GlobalKey<FormState>();
   final email = TextEditingController();
   final password = TextEditingController();
-
-  bool isLogin = true;
-  late String title;
-  late String actionButton;
-  late String toggleButton;
-  bool loading = false;
+  bool _loading = false;
 
   @override
   void initState() {
     super.initState();
-    setFormAction(true);
-  }
-
-  setFormAction(bool action) {
-    setState(() {
-      isLogin = action;
-      if (isLogin) {
-        title = 'Bem vindo';
-        actionButton = 'Login';
-        toggleButton = 'Ainda não tem conta? Cadastre-se agora.';
-      } else {
-        title = 'Crie sua conta';
-        actionButton = 'Cadastrar';
-        toggleButton = 'Voltar ao Login.';
-      }
-    });
   }
 
   login() async {
-    setState(() => loading = true);
+    setState(() => _loading = true);
     try {
       await context.read<AuthService>().login(email.text, password.text);
     } on AuthException catch (e) {
-      setState(() => loading = false);
-      ScaffoldMessenger.of(context)
-          .showSnackBar(SnackBar(content: Text(e.message)));
+      setState(() => _loading = false);
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(e.message)),
+      );
     }
   }
 
-  registrar() async {
-    setState(() => loading = true);
+  loginWithGoogle() async {
     try {
-      await context.read<AuthService>().register(email.text, password.text);
-    } on AuthException catch (e) {
-      setState(() => loading = false);
-      ScaffoldMessenger.of(context)
-          .showSnackBar(SnackBar(content: Text(e.message)));
+      await context.read<GoogleSignInService>().signInWithGoogle();
+    } on GoogleAuthException catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(e.message)),
+      );
     }
+  }
+
+  _goToRegister() {
+    Navigator.pushNamed(context, AppRoutes.REGISTER);
   }
 
   @override
@@ -75,7 +61,7 @@ class _LoginPageState extends State<LoginPage> {
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 Text(
-                  title,
+                  'Bem Vindo!',
                   style: TextStyle(
                     fontSize: 35,
                     fontWeight: FontWeight.bold,
@@ -91,12 +77,9 @@ class _LoginPageState extends State<LoginPage> {
                       labelText: 'Email',
                     ),
                     keyboardType: TextInputType.emailAddress,
-                    validator: (value) {
-                      if (value!.isEmpty) {
-                        return 'Informe o email corretamente!';
-                      }
-                      return null;
-                    },
+                    validator: (value) => (value!.isEmpty)
+                        ? 'Informe o email corretamente!'
+                        : null,
                   ),
                 ),
                 Padding(
@@ -126,16 +109,12 @@ class _LoginPageState extends State<LoginPage> {
                   child: ElevatedButton(
                     onPressed: () {
                       if (formKey.currentState!.validate()) {
-                        if (isLogin) {
-                          login();
-                        } else {
-                          registrar();
-                        }
+                        login();
                       }
                     },
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.center,
-                      children: (loading)
+                      children: (_loading)
                           ? [
                               Padding(
                                 padding: EdgeInsets.all(16),
@@ -149,11 +128,11 @@ class _LoginPageState extends State<LoginPage> {
                               )
                             ]
                           : [
-                              Icon(Icons.check),
+                              Icon(Icons.login),
                               Padding(
                                 padding: EdgeInsets.all(16.0),
                                 child: Text(
-                                  actionButton,
+                                  'Login',
                                   style: TextStyle(fontSize: 20),
                                 ),
                               ),
@@ -162,8 +141,30 @@ class _LoginPageState extends State<LoginPage> {
                   ),
                 ),
                 TextButton(
-                  onPressed: () => setFormAction(!isLogin),
-                  child: Text(toggleButton),
+                  onPressed: () => _goToRegister(),
+                  child: Text('Ainda não tem conta? Cadastre-se agora.'),
+                ),
+                Padding(
+                  padding: EdgeInsets.all(24.0),
+                  child: ElevatedButton(
+                    onPressed: () {
+                      loginWithGoogle();
+                    },
+                    style: ElevatedButton.styleFrom(primary: Colors.red),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Icon(FontAwesomeIcons.google),
+                        Padding(
+                          padding: EdgeInsets.all(12.0),
+                          child: Text(
+                            'Login com Google',
+                            style: TextStyle(fontSize: 20),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
                 ),
               ],
             ),
