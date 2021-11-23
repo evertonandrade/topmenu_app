@@ -25,8 +25,7 @@ class AuthService extends ChangeNotifier {
 
   register(String email, String password) async {
     try {
-      await _auth.createUserWithEmailAndPassword(
-          email: email, password: password);
+      await _auth.createUserWithEmailAndPassword(email: email, password: password);
       _getUser();
     } on FirebaseAuthException catch (e) {
       if (e.code == 'weak-password') {

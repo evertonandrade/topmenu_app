@@ -10,7 +10,7 @@ class ItemsService with ChangeNotifier {
 
   setIdMenu(dynamic id) {
     idMenu = id;
-    notifyListeners();
+    //notifyListeners();
   }
 
   clear() {
@@ -50,7 +50,7 @@ class ItemsService with ChangeNotifier {
       await http.patch(
         Uri.https(
           Config.baseUrl,
-          'menus/${idMenu}/items/${item.id}.json',
+          'menus/$idMenu/items/${item.id}.json',
         ),
         body: json.encode({
           'name': item.name,
@@ -74,7 +74,7 @@ class ItemsService with ChangeNotifier {
       final response = await http.post(
         Uri.https(
           Config.baseUrl,
-          'menus/${idMenu}/items.json',
+          'menus/$idMenu/items.json',
         ),
         body: json.encode({
           'name': item.name,
@@ -107,7 +107,7 @@ class ItemsService with ChangeNotifier {
     http.delete(
       Uri.https(
         Config.baseUrl,
-        'menus/${idMenu}/items/${item?.id}.json',
+        'menus/$idMenu/items/${item?.id}.json',
       ),
     );
     _items.remove(item?.id);

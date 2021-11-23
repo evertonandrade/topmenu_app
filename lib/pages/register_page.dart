@@ -1,32 +1,26 @@
-import 'package:font_awesome_flutter/font_awesome_flutter.dart';
-import 'package:topmenu_app/routes/app_routes.dart';
-import 'package:topmenu_app/services/auth_service.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:topmenu_app/services/google_sigin_service.dart';
+import 'package:topmenu_app/routes/app_routes.dart';
+import 'package:topmenu_app/services/auth_service.dart';
 
-class LoginPage extends StatefulWidget {
-  LoginPage({Key? key}) : super(key: key);
+class RegisterPage extends StatefulWidget {
+  RegisterPage({Key? key}) : super(key: key);
 
   @override
-  _LoginPageState createState() => _LoginPageState();
+  _RegisterPageState createState() => _RegisterPageState();
 }
 
-class _LoginPageState extends State<LoginPage> {
+class _RegisterPageState extends State<RegisterPage> {
   final formKey = GlobalKey<FormState>();
   final email = TextEditingController();
   final password = TextEditingController();
+  final confirmPassword = TextEditingController();
   bool _loading = false;
 
-  @override
-  void initState() {
-    super.initState();
-  }
-
-  login() async {
+  register() async {
     setState(() => _loading = true);
     try {
-      await context.read<AuthService>().login(email.text, password.text);
+      await context.read<AuthService>().register(email.text, password.text);
     } on AuthException catch (e) {
       setState(() => _loading = false);
       ScaffoldMessenger.of(context).showSnackBar(
@@ -35,18 +29,8 @@ class _LoginPageState extends State<LoginPage> {
     }
   }
 
-  loginWithGoogle() async {
-    try {
-      await context.read<GoogleSignInService>().signInWithGoogle();
-    } on GoogleAuthException catch (e) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text(e.message)),
-      );
-    }
-  }
-
-  _goToRegister() {
-    Navigator.pushNamed(context, AppRoutes.REGISTER);
+  _goToLogin() {
+    Navigator.pushNamed(context, AppRoutes.LOGIN);
   }
 
   @override
@@ -61,7 +45,7 @@ class _LoginPageState extends State<LoginPage> {
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 Text(
-                  'Bem Vindo!',
+                  'Crie sua conta!',
                   style: TextStyle(
                     fontSize: 35,
                     fontWeight: FontWeight.bold,
@@ -105,11 +89,33 @@ class _LoginPageState extends State<LoginPage> {
                   ),
                 ),
                 Padding(
+                  padding: EdgeInsets.symmetric(
+                    vertical: 12.0,
+                    horizontal: 24.0,
+                  ),
+                  child: TextFormField(
+                    controller: confirmPassword,
+                    obscureText: true,
+                    decoration: InputDecoration(
+                      border: OutlineInputBorder(),
+                      labelText: 'Confirmar Senha',
+                    ),
+                    validator: (value) {
+                      if (value!.isEmpty) {
+                        return 'Confirme sua senha!';
+                      } else if (value != password.text) {
+                        return 'As senhas não coincidem';
+                      }
+                      return null;
+                    },
+                  ),
+                ),
+                Padding(
                   padding: EdgeInsets.all(24.0),
                   child: ElevatedButton(
                     onPressed: () {
                       if (formKey.currentState!.validate()) {
-                        login();
+                        register();
                       }
                     },
                     child: Row(
@@ -128,11 +134,11 @@ class _LoginPageState extends State<LoginPage> {
                               )
                             ]
                           : [
-                              Icon(Icons.login),
+                              Icon(Icons.app_registration),
                               Padding(
                                 padding: EdgeInsets.all(16.0),
                                 child: Text(
-                                  'Login',
+                                  'Cadastrar',
                                   style: TextStyle(fontSize: 20),
                                 ),
                               ),
@@ -141,30 +147,8 @@ class _LoginPageState extends State<LoginPage> {
                   ),
                 ),
                 TextButton(
-                  onPressed: () => _goToRegister(),
-                  child: Text('Ainda não tem conta? Cadastre-se agora.'),
-                ),
-                Padding(
-                  padding: EdgeInsets.all(24.0),
-                  child: ElevatedButton(
-                    onPressed: () {
-                      loginWithGoogle();
-                    },
-                    style: ElevatedButton.styleFrom(primary: Colors.red),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Icon(FontAwesomeIcons.google),
-                        Padding(
-                          padding: EdgeInsets.all(12.0),
-                          child: Text(
-                            'Login com Google',
-                            style: TextStyle(fontSize: 20),
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
+                  onPressed: () => _goToLogin(),
+                  child: Text('Voltar ao login.'),
                 ),
               ],
             ),
