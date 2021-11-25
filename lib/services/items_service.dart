@@ -6,12 +6,6 @@ import 'package:topmenu_app/shared/config.dart';
 
 class ItemsService with ChangeNotifier {
   Map<String, Item> _items = {};
-  String idMenu = '';
-
-  setIdMenu(dynamic id) {
-    idMenu = id;
-    //notifyListeners();
-  }
 
   clear() {
     _items = {};
@@ -29,8 +23,8 @@ class ItemsService with ChangeNotifier {
     return _items.values.elementAt(index);
   }
 
-  Future getAll() async {
-    var path = 'menus/' + idMenu + '/items.json';
+  Future getAll(String idMenu, String idCategory) async {
+    var path = 'menus/$idMenu/categories/$idCategory/items.json';
     var response = await http.get(
       Uri.https(Config.baseUrl, path),
     );
@@ -44,13 +38,46 @@ class ItemsService with ChangeNotifier {
     notifyListeners();
   }
 
-  Future<void> put(Item item) async {
-    // altera ou adiciona
+  Future<void> save(String idMenu, String idCategory, Item item) async {
+    var path = 'menus/$idMenu/categories/$idCategory/items.json';
+    final response = await http.post(
+      Uri.https(
+        Config.baseUrl,
+        path,
+      ),
+      body: json.encode({
+        'name': item.name,
+        'description': item.description,
+        'price': item.price,
+        'imageUrl': item.imageUrl,
+        'avaliable': item.avaliable,
+      }),
+    );
+
+    final id = json.decode(response.body)['name'];
+
+    _items.putIfAbsent(
+      id,
+      () => Item(
+        id: id,
+        name: item.name,
+        description: item.description,
+        price: item.price,
+        imageUrl: item.imageUrl,
+        avaliable: item.avaliable,
+      ),
+    );
+
+    notifyListeners();
+  }
+
+  Future<void> update(String idMenu, String idCategory, Item item) async {
+    var path = 'menus/$idMenu/categories/$idCategory/items/${item.id}.json';
     if (_items.containsKey(item.id)) {
       await http.patch(
         Uri.https(
           Config.baseUrl,
-          'menus/$idMenu/items/${item.id}.json',
+          path,
         ),
         body: json.encode({
           'name': item.name,
@@ -70,44 +97,17 @@ class ItemsService with ChangeNotifier {
           avaliable: item.avaliable,
         ),
       );
-    } else {
-      final response = await http.post(
-        Uri.https(
-          Config.baseUrl,
-          'menus/$idMenu/items.json',
-        ),
-        body: json.encode({
-          'name': item.name,
-          'description': item.description,
-          'price': item.price,
-          'imageUrl': item.imageUrl,
-          'avaliable': item.avaliable,
-        }),
-      );
-
-      final id = json.decode(response.body)['name'];
-
-      _items.putIfAbsent(
-        id,
-        () => Item(
-          id: id,
-          name: item.name,
-          description: item.description,
-          price: item.price,
-          imageUrl: item.imageUrl,
-          avaliable: item.avaliable,
-        ),
-      );
     }
 
     notifyListeners();
   }
 
-  Future<void> remove(Item? item) async {
+  Future<void> remove(String idMenu, String idCategory, Item? item) async {
+    var path = 'menus/$idMenu/categories/$idCategory/items/${item?.id}.json';
     http.delete(
       Uri.https(
         Config.baseUrl,
-        'menus/$idMenu/items/${item?.id}.json',
+        path,
       ),
     );
     _items.remove(item?.id);
