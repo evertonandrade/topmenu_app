@@ -12,6 +12,7 @@ class RegisterPage extends StatefulWidget {
 
 class _RegisterPageState extends State<RegisterPage> {
   final formKey = GlobalKey<FormState>();
+  final name = TextEditingController();
   final email = TextEditingController();
   final password = TextEditingController();
   final confirmPassword = TextEditingController();
@@ -20,12 +21,15 @@ class _RegisterPageState extends State<RegisterPage> {
   register() async {
     setState(() => _loading = true);
     try {
-      await context.read<AuthService>().register(email.text, password.text);
+      await context
+          .read<AuthService>()
+          .register(name.text, email.text, password.text);
     } on AuthException catch (e) {
-      setState(() => _loading = false);
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text(e.message)),
       );
+    } finally {
+      setState(() => _loading = false);
     }
   }
 
@@ -38,7 +42,7 @@ class _RegisterPageState extends State<RegisterPage> {
     return Scaffold(
       body: SingleChildScrollView(
         child: Padding(
-          padding: EdgeInsets.only(top: 100),
+          padding: EdgeInsets.only(top: 80),
           child: Form(
             key: formKey,
             child: Column(
@@ -52,8 +56,29 @@ class _RegisterPageState extends State<RegisterPage> {
                     letterSpacing: -1.5,
                   ),
                 ),
+                SizedBox(height: 20),
                 Padding(
-                  padding: EdgeInsets.all(24),
+                  padding: EdgeInsets.symmetric(
+                    vertical: 12.0,
+                    horizontal: 24.0,
+                  ),
+                  child: TextFormField(
+                    controller: name,
+                    decoration: InputDecoration(
+                      border: OutlineInputBorder(),
+                      labelText: 'Nome',
+                    ),
+                    keyboardType: TextInputType.name,
+                    validator: (value) =>
+                        (value!.isEmpty) ? 'Informe seu nome de usuário' : null,
+                  ),
+                ),
+                Padding(
+                  padding: EdgeInsets.symmetric(
+                    vertical: 12.0,
+                    horizontal: 24.0,
+
+                  ),
                   child: TextFormField(
                     controller: email,
                     decoration: InputDecoration(

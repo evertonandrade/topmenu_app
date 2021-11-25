@@ -122,7 +122,7 @@ class _MenuTileState extends State<MenuTile> {
               onTap: () {
                 Navigator.pushNamed(
                   context,
-                  AppRoutes.ITEM,
+                  AppRoutes.CATEGORY,
                   arguments: widget.menu,
                 );
               },

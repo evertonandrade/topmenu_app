@@ -1,14 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:topmenu_app/models/menu.dart';
+import 'package:topmenu_app/models/category.dart';
 import 'package:topmenu_app/routes/app_routes.dart';
 import 'package:topmenu_app/services/items_service.dart';
 import 'package:topmenu_app/widgets/item_tile.dart';
 
 class ItemPage extends StatefulWidget {
-  final Menu menu;
+  final Category category;
 
-  ItemPage(this.menu);
+  ItemPage(this.category);
 
   @override
   _ItemPageState createState() => _ItemPageState();
@@ -20,20 +20,17 @@ class _ItemPageState extends State<ItemPage> {
   @override
   void initState() {
     super.initState();
-    setMenuId();
     getAllItems();
   }
 
-  setMenuId() {
-    context.read<ItemsService>().setIdMenu(widget.menu.id);
-  }
-
   getAllItems() async {
-    setState(() => this._isLoading = true);
+    if (mounted) setState(() => this._isLoading = true);
     try {
+      var idMenu = widget.category.idMenu as String;
+      var idCategory = widget.category.id as String;
       final serviceItems = context.read<ItemsService>();
       serviceItems.clear();
-      await serviceItems.getAll();
+      await serviceItems.getAll(idMenu, idCategory);
     } on Exception catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
@@ -41,7 +38,7 @@ class _ItemPageState extends State<ItemPage> {
         ),
       );
     } finally {
-      setState(() => _isLoading = false);
+      if (mounted) setState(() => _isLoading = false);
     }
   }
 
@@ -51,12 +48,16 @@ class _ItemPageState extends State<ItemPage> {
 
     return Scaffold(
       appBar: AppBar(
-        title: Text('Items - ${widget.menu.title}'),
+        title: Text('Items'),
         actions: [
           IconButton(
             icon: Icon(Icons.add),
             onPressed: () {
-              Navigator.of(context).pushNamed(AppRoutes.ITEM_FORM);
+              Navigator.pushNamed(
+                context,
+                AppRoutes.ITEM_FORM,
+                arguments: widget.category,
+              );
             },
           ),
         ],
@@ -69,6 +70,8 @@ class _ItemPageState extends State<ItemPage> {
                 itemCount: items.count,
                 itemBuilder: (ctx, i) => ItemTile(
                   items.byIndex(i),
+                  widget.category.idMenu as String,
+                  widget.category.id as String,
                 ),
               ),
             ),
