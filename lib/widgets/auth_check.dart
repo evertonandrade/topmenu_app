@@ -1,11 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:topmenu_app/pages/login_page.dart';
+import 'package:topmenu_app/pages/root_page.dart';
 import 'package:topmenu_app/services/auth_service.dart';
-import 'package:topmenu_app/pages/home_page.dart';
 
 class AuthCheck extends StatefulWidget {
-  AuthCheck({Key? key}) : super(key: key);
 
   @override
   _AuthCheckState createState() => _AuthCheckState();
@@ -21,7 +20,7 @@ class _AuthCheckState extends State<AuthCheck> {
     else if (auth.user == null)
       return LoginPage();
     else
-      return HomePage();
+      return RootPage();
   }
 
   loading() {
