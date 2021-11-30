@@ -6,7 +6,7 @@ import 'package:provider/provider.dart';
 import 'package:topmenu_app/services/items_service.dart';
 import 'package:topmenu_app/services/menus_service.dart';
 import 'package:topmenu_app/services/auth_service.dart';
-import 'package:topmenu_app/services/google_sigin_service.dart';
+import 'package:topmenu_app/services/categories_service.dart';
 
 Future main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -17,9 +17,9 @@ Future main() async {
     MultiProvider(
       providers: [
         ChangeNotifierProvider(create: (context) => AuthService()),
-        ChangeNotifierProvider(create: (context) => GoogleSignInService()),
         ChangeNotifierProvider(create: (context) => ItemsService()),
         ChangeNotifierProvider(create: (context) => MenusService()),
+        ChangeNotifierProvider(create: (context) => CategoriesService()),
       ],
       child: TopMenuApp(),
     ),

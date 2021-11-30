@@ -10,7 +10,7 @@ class TopMenuApp extends StatelessWidget {
       debugShowCheckedModeBanner: false,
       theme: ThemeData(primarySwatch: Colors.deepOrange),
       onGenerateRoute: router.generateRoute,
-      initialRoute: AppRoutes.HOME,
+      initialRoute: AppRoutes.ROOT,
     );
   }
 }

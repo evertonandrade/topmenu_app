@@ -23,8 +23,13 @@ class _MenuPageState extends State<MenuPage> {
     getAllMenus();
   }
 
+  @override
+  void dispose() {
+    super.dispose();
+  }
+
   getAllMenus() async {
-    setState(() => this._isLoading = true);
+    if (mounted) setState(() => this._isLoading = true);
     try {
       await context.read<MenusService>().getAll();
     } on Exception catch (e) {
@@ -34,7 +39,7 @@ class _MenuPageState extends State<MenuPage> {
         ),
       );
     } finally {
-      setState(() => _isLoading = false);
+      if (mounted) setState(() => _isLoading = false);
     }
   }
 

@@ -1,10 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:topmenu_app/models/category.dart';
 import 'package:topmenu_app/models/item.dart';
 import 'package:topmenu_app/services/items_service.dart';
 
 class ItemForm extends StatefulWidget {
-  ItemForm({Key? key}) : super(key: key);
+  final Category category;
+
+  ItemForm(this.category);
 
   @override
   _ItemFormState createState() => _ItemFormState();
@@ -12,10 +15,8 @@ class ItemForm extends StatefulWidget {
 
 class _ItemFormState extends State<ItemForm> {
   final _form = GlobalKey<FormState>();
-
-  bool _isLoading = false;
-
   final Map<String, Object> _formData = {};
+  bool _isLoading = false;
 
   @override
   Widget build(BuildContext context) {
@@ -30,7 +31,9 @@ class _ItemFormState extends State<ItemForm> {
               if (isValid) {
                 _form.currentState?.save();
                 setState(() => _isLoading = true);
-                await Provider.of<ItemsService>(context, listen: false).put(
+                await Provider.of<ItemsService>(context, listen: false).save(
+                  widget.category.idMenu as String,
+                  widget.category.id as String,
                   Item(
                     name: _formData['name'].toString(),
                     description: _formData['description'].toString(),

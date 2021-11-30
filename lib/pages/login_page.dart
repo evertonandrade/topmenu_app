@@ -3,7 +3,6 @@ import 'package:topmenu_app/routes/app_routes.dart';
 import 'package:topmenu_app/services/auth_service.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:topmenu_app/services/google_sigin_service.dart';
 
 class LoginPage extends StatefulWidget {
   LoginPage({Key? key}) : super(key: key);
@@ -28,20 +27,24 @@ class _LoginPageState extends State<LoginPage> {
     try {
       await context.read<AuthService>().login(email.text, password.text);
     } on AuthException catch (e) {
-      setState(() => _loading = false);
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text(e.message)),
       );
+    } finally {
+      setState(() => _loading = false);
     }
   }
 
   loginWithGoogle() async {
+    setState(() => _loading = true);
     try {
-      await context.read<GoogleSignInService>().signInWithGoogle();
-    } on GoogleAuthException catch (e) {
+      await context.read<AuthService>().signInWithGoogle();
+    } on AuthException catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text(e.message)),
       );
+    } finally {
+      setState(() => _loading = false);
     }
   }
 
